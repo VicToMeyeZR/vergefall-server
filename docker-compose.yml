@@ -42,6 +42,8 @@ services:
         exec /nakama/nakama \
           --name vergefall \
           --database.address "postgres:$${POSTGRES_PASSWORD}@postgres:5432/nakama" \
+          --config /nakama/data/local.yml \
+          --runtime.path /nakama/data \
           --console.username "$${CONSOLE_USERNAME}" \
           --console.password "$${CONSOLE_PASSWORD}" \
           --console.signing_key "$${CONSOLE_SIGNING_KEY}" \
