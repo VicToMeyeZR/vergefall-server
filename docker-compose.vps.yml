@@ -1,4 +1,4 @@
-# Ubuntu VPS — Caddy terminates HTTPS on trystarbot.space.
+# Ubuntu VPS — Caddy terminates HTTPS on server1.trystarbot.space (209.74.87.104).
 # Nakama/Postgres stay on the docker network. Console is localhost-only.
 #
 #   docker compose -f docker-compose.vps.yml up -d --build
@@ -48,7 +48,7 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      DOMAIN: ${DOMAIN:-trystarbot.space}
+      DOMAIN: ${DOMAIN:-server1.trystarbot.space}
       CADDY_EMAIL: ${CADDY_EMAIL:-admin@trystarbot.space}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro

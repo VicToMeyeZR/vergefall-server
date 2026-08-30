@@ -85,7 +85,7 @@ the battle report.
 
 Sleep / Serverless / scale-to-zero **off**. A sleeping galaxy is a broken galaxy.
 
-**Ubuntu VPS at trystarbot.space:** follow **[SETUP.md](SETUP.md)** (`docker-compose.vps.yml` + Caddy on 443).
+**Ubuntu VPS at server1.trystarbot.space:** follow **[SETUP.md](SETUP.md)** (`docker-compose.vps.yml` + Caddy on 443).
 
 - Build from this Dockerfile (plugin is baked; do not volume-mount a Windows `.so`).
 - Public HTTPS is **443** via Caddy. Nakama 7350 stays on the docker network.
