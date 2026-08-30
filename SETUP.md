@@ -104,12 +104,16 @@ ssh -L 7351:127.0.0.1:7351 root@209.74.87.104
 
 Then open http://127.0.0.1:7351 — user from `CONSOLE_USERNAME`, password from `.env`.
 
-## 9. Later updates
+## 9. Auto-update from GitHub
+
+An `updater` service polls `origin/main` every 60s and rebuilds only when the commit changes. `.env` is untracked and is not overwritten.
+
+Clone path **must** be `/opt/vergefall-server` (that path is bind-mounted into the updater).
+
+After the first `docker compose up -d --build`, you do not pull by hand.
 
 ```bash
-cd /opt/vergefall-server
-git pull
-docker compose up -d --build
+docker compose logs -f updater
 ```
 
 World snapshots live in Nakama storage (Postgres volume `pgdata`). Do not delete named volumes unless you intend to wipe rim-1.

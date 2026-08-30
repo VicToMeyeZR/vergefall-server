@@ -85,6 +85,19 @@ services:
       - edge
     restart: unless-stopped
 
+  updater:
+    image: docker:27-cli
+    working_dir: /opt/vergefall-server
+    environment:
+      REPO_DIR: /opt/vergefall-server
+      COMPOSE_PROJECT_NAME: vergefall-server
+      GIT_TERMINAL_PROMPT: "0"
+    volumes:
+      - /opt/vergefall-server:/opt/vergefall-server
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: ["/bin/sh", "/opt/vergefall-server/scripts/auto-update.sh"]
+    restart: unless-stopped
+
 volumes:
   pgdata:
   caddy_data:
