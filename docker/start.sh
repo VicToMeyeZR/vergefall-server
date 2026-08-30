@@ -16,4 +16,6 @@ exec /nakama/nakama \
   --config /nakama/data/local.yml \
   --runtime.path /nakama/data \
   --session.token_expiry_sec "${SESSION_TOKEN_EXPIRY_SEC:-7200}" \
-  --logger.level "${NAKAMA_LOG_LEVEL:-INFO}"
+  --logger.level "${NAKAMA_LOG_LEVEL:-INFO}" \
+  --console.username admin \
+  --console.password "${CONSOLE_PASSWORD:-localdev}"

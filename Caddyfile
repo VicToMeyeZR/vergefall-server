@@ -1,0 +1,10 @@
+{
+	email {$CADDY_EMAIL:admin@trystarbot.space}
+}
+
+{$DOMAIN:trystarbot.space} {
+	encode gzip
+	reverse_proxy nakama:7350 {
+		flush_interval -1
+	}
+}

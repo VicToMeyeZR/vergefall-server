@@ -85,11 +85,12 @@ the battle report.
 
 Sleep / Serverless / scale-to-zero **off**. A sleeping galaxy is a broken galaxy.
 
+**Ubuntu VPS at trystarbot.space:** follow **[SETUP.md](SETUP.md)** (`docker-compose.vps.yml` + Caddy on 443).
+
 - Build from this Dockerfile (plugin is baked; do not volume-mount a Windows `.so`).
-- Separate Postgres. Set `DATABASE_URL` or `DATABASE_ADDRESS`.
-- Public HTTPS on **7350** (HTTP + WebSocket) for the JS Helm.
-- UE5 gRPC is **7349** — native port on a VPS; Railway TCP proxy is a last resort.
-- Console 7351 stays private.
+- Public HTTPS is **443** via Caddy. Nakama 7350 stays on the docker network.
+- UE5 gRPC is **7349** on localhost (SSH tunnel) until you open it.
+- Console 7351 is localhost-only.
 
 Version pairing is strict: **pluginbuilder 3.21.1 / nakama 3.21.1 / nakama-common v1.31.0**.
 
