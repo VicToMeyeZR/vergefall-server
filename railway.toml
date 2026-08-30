@@ -1,0 +1,13 @@
+# Railway: one Nakama service (this Dockerfile) + a separate Postgres plugin.
+# Point DATABASE_URL at the plugin. Public networking target port 7350.
+# Serverless / App Sleeping MUST stay off — the galaxy ticks empty.
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 8
+healthcheckTimeout = 30
+# Nakama's HTTP API answers on 7350; set the service's target port to 7350
+# in the Railway dashboard (or RAILWAY_HEALTHCHECK_PATH is unused here).

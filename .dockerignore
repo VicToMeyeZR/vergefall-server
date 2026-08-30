@@ -1,0 +1,7 @@
+modules
+**/*.so
+.git
+GameGDD
+**/*.ps1
+DEVLOG.md
+README.md

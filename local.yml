@@ -1,0 +1,15 @@
+name: vergefall-1
+logger:
+  format: json
+  level: INFO
+session:
+  token_expiry_sec: 7200
+socket:
+  server_key: defaultkey
+  port: 7350
+  max_message_size_bytes: 4096
+runtime:
+  path: /nakama/data
+console:
+  username: admin
+  password: localdev
