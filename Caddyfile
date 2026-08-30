@@ -1,5 +1,13 @@
+{
+	servers {
+		protocols h1 h2
+	}
+}
+
 {$DOMAIN} {
-    tls {$CADDY_EMAIL}
-    encode zstd gzip
-    reverse_proxy nakama:7350
+	tls {$CADDY_EMAIL}
+	encode gzip
+	reverse_proxy nakama:7350 {
+		flush_interval -1
+	}
 }
