@@ -56,13 +56,12 @@ cp .env.example .env
 nano .env
 ```
 
-Set `POSTGRES_PASSWORD` and `CONSOLE_PASSWORD` to long alphanumeric strings. **No** `@ : / #` in the postgres password.
+Set every `change_this_*` value in `.env`. Alphanumeric only for `POSTGRES_PASSWORD`.
+
+This Helm still authenticates with socket key `defaultkey`. Until we rotate it, set:
 
 ```
-DOMAIN=server1.trystarbot.space
-CADDY_EMAIL=you@your-email
-POSTGRES_PASSWORD=pickALongAlphanumeric
-CONSOLE_PASSWORD=pickAnother
+SOCKET_SERVER_KEY=defaultkey
 ```
 
 ## 6. Build and start
@@ -71,8 +70,8 @@ First boot compiles the Go plugin. Give it a few minutes.
 
 ```bash
 cd /opt/vergefall-server
-docker compose -f docker-compose.vps.yml up -d --build
-docker compose -f docker-compose.vps.yml logs -f nakama
+docker compose up -d --build
+docker compose logs -f nakama
 ```
 
 You want:
@@ -85,7 +84,7 @@ Vergefall module loaded — system rim-1 online
 Ctrl-C leaves the stack running. Check Caddy got a cert:
 
 ```bash
-docker compose -f docker-compose.vps.yml logs caddy | tail -30
+docker compose logs caddy | tail -30
 curl -sI https://server1.trystarbot.space
 ```
 
@@ -103,14 +102,14 @@ Steel thread: enlist is automatic on join. System map → pirate hex `+4,−2` �
 ssh -L 7351:127.0.0.1:7351 root@209.74.87.104
 ```
 
-Then open http://127.0.0.1:7351 — user `admin`, password from `.env`.
+Then open http://127.0.0.1:7351 — user from `CONSOLE_USERNAME`, password from `.env`.
 
 ## 9. Later updates
 
 ```bash
 cd /opt/vergefall-server
 git pull
-docker compose -f docker-compose.vps.yml up -d --build
+docker compose up -d --build
 ```
 
 World snapshots live in Nakama storage (Postgres volume `pgdata`). Do not delete named volumes unless you intend to wipe rim-1.

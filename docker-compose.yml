@@ -1,17 +1,15 @@
-# Vergefall — Nakama 3.21.1 + Postgres 15
-# Galaxy sim is a baked Go plugin. Do not enable app-sleep / scale-to-zero:
-# rim-1 ticks whether anyone is watching.
-#
-#   docker compose up --build
-version: "3.8"
 services:
   postgres:
     image: postgres:15
     environment:
       POSTGRES_DB: nakama
-      POSTGRES_PASSWORD: localdev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d nakama"]
       interval: 5s
@@ -25,13 +23,42 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_ADDRESS: postgres:localdev@postgres:5432/nakama
-      SESSION_TOKEN_EXPIRY_SEC: "7200"
-      NAKAMA_LOG_LEVEL: INFO
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      CONSOLE_USERNAME: ${CONSOLE_USERNAME:?CONSOLE_USERNAME is required}
+      CONSOLE_PASSWORD: ${CONSOLE_PASSWORD:?CONSOLE_PASSWORD is required}
+      CONSOLE_SIGNING_KEY: ${CONSOLE_SIGNING_KEY:?CONSOLE_SIGNING_KEY is required}
+      SOCKET_SERVER_KEY: ${SOCKET_SERVER_KEY:?SOCKET_SERVER_KEY is required}
+      SESSION_ENCRYPTION_KEY: ${SESSION_ENCRYPTION_KEY:?SESSION_ENCRYPTION_KEY is required}
+      SESSION_REFRESH_ENCRYPTION_KEY: ${SESSION_REFRESH_ENCRYPTION_KEY:?SESSION_REFRESH_ENCRYPTION_KEY is required}
+      RUNTIME_HTTP_KEY: ${RUNTIME_HTTP_KEY:?RUNTIME_HTTP_KEY is required}
+      SESSION_TOKEN_EXPIRY_SEC: ${SESSION_TOKEN_EXPIRY_SEC:-7200}
+      SESSION_REFRESH_TOKEN_EXPIRY_SEC: ${SESSION_REFRESH_TOKEN_EXPIRY_SEC:-604800}
+      NAKAMA_LOG_LEVEL: ${NAKAMA_LOG_LEVEL:-INFO}
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - |
+        /nakama/nakama migrate up --database.address "postgres:$${POSTGRES_PASSWORD}@postgres:5432/nakama"
+        exec /nakama/nakama \
+          --name vergefall \
+          --database.address "postgres:$${POSTGRES_PASSWORD}@postgres:5432/nakama" \
+          --console.username "$${CONSOLE_USERNAME}" \
+          --console.password "$${CONSOLE_PASSWORD}" \
+          --console.signing_key "$${CONSOLE_SIGNING_KEY}" \
+          --socket.server_key "$${SOCKET_SERVER_KEY}" \
+          --session.encryption_key "$${SESSION_ENCRYPTION_KEY}" \
+          --session.refresh_encryption_key "$${SESSION_REFRESH_ENCRYPTION_KEY}" \
+          --runtime.http_key "$${RUNTIME_HTTP_KEY}" \
+          --session.token_expiry_sec "$${SESSION_TOKEN_EXPIRY_SEC}" \
+          --session.refresh_token_expiry_sec "$${SESSION_REFRESH_TOKEN_EXPIRY_SEC}" \
+          --logger.level "$${NAKAMA_LOG_LEVEL}"
     ports:
-      - "7349:7349"   # gRPC (UE SDK)
-      - "7350:7350"   # HTTP + WebSocket (JS SDK, this Helm)
-      - "7351:7351"   # console (admin / localdev — change it)
+      - "7349:7349"
+      - "127.0.0.1:7350:7350"
+      - "127.0.0.1:7351:7351"
+    networks:
+      - backend
+      - edge
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "/nakama/nakama", "healthcheck"]
@@ -39,5 +66,32 @@ services:
       timeout: 5s
       retries: 8
 
+  caddy:
+    image: caddy:2-alpine
+    depends_on:
+      nakama:
+        condition: service_healthy
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN is required}
+      CADDY_EMAIL: ${CADDY_EMAIL:?CADDY_EMAIL is required}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - edge
+    restart: unless-stopped
+
 volumes:
   pgdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  backend:
+    internal: true
+  edge:
